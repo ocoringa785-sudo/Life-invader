@@ -1,0 +1,194 @@
+acabei de criar a Life invader
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Life Invader</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+
+    body {
+      background-color: #f0f2f5;
+      color: #1c1e21;
+      padding: 20px;
+      max-width: 500px;
+      margin: 0 auto;
+    }
+
+    .container {
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+
+    h1 {
+      text-align: center;
+      font-size: 24px;
+      margin-bottom: 20px;
+    }
+
+    input, button {
+      width: 100%;
+      padding: 12px;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      font-size: 16px;
+    }
+
+    button {
+      background-color: #1877f2;
+      color: white;
+      border: none;
+      font-weight: bold;
+      cursor: pointer;
+      margin-top: 10px;
+    }
+
+    button:hover {
+      background-color: #166fe5;
+    }
+
+    .profile {
+      background: white;
+      padding: 20px;
+      border-radius: 12px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+      text-align: center;
+    }
+
+    .profile img {
+      width: 100px;
+      height: 100px;
+      border-radius: 50%;
+      object-fit: cover;
+      border: 3px solid #1877f2;
+      margin-bottom: 15px;
+      cursor: pointer;
+    }
+
+    .followers {
+      margin-top: 10px;
+      font-weight: bold;
+      color: #65676b;
+    }
+
+    .edit-btn {
+      background-color: #42b72a;
+      margin-top: 15px;
+    }
+
+    .hidden {
+      display: none;
+    }
+
+    #fileInput {
+      display: none;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <!-- Tela de Login -->
+    <div id="loginScreen">
+      <h1>Bem-vindo ao Life Invader</h1>
+      <input type="text" id="username" placeholder="Nome de usuário" />
+      <input type="password" id="password" placeholder="Senha" />
+      <button onclick="login()">Entrar</button>
+    </div>
+
+    <!-- Tela de Perfil -->
+    <div id="profileScreen" class="hidden">
+      <div class="profile">
+        <img id="profilePic" src="https://via.placeholder.com/100?text=Foto" alt="Foto de perfil" onclick="document.getElementById('fileInput').click()" />
+        <input type="file" id="fileInput" accept="image/*" onchange="changeProfilePic(event)" />
+        
+        <div id="displayName">Usuário</div>
+        <button class="edit-btn" onclick="editUsername()">Editar Nome</button>
+        
+        <div class="followers">Seguidores: <span id="followersCount">0</span></div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Verifica se já está logado
+    window.onload = function() {
+      const savedUser = localStorage.getItem('lifeInvaderUser');
+      if (savedUser) {
+        const user = JSON.parse(savedUser);
+        showProfile(user.username, user.profilePic || null);
+      }
+    };
+
+    function login() {
+      const username = document.getElementById('username').value.trim();
+      const password = document.getElementById('password').value;
+
+      if (!username || !password) {
+        alert('Preencha usuário e senha!');
+        return;
+      }
+
+      // Salva no localStorage (simula login)
+      const user = {
+        username: username,
+        password: password, // ⚠️ Em um site real, NUNCA salve senhas em texto claro!
+        followers: 0,
+        profilePic: null
+      };
+
+      localStorage.setItem('lifeInvaderUser', JSON.stringify(user));
+      showProfile(username);
+    }
+
+    function showProfile(username, profilePic = null) {
+      document.getElementById('loginScreen').classList.add('hidden');
+      document.getElementById('profileScreen').classList.remove('hidden');
+      document.getElementById('displayName').textContent = username;
+      
+      const img = document.getElementById('profilePic');
+      if (profilePic) {
+        img.src = profilePic;
+      } else {
+        img.src = "https://via.placeholder.com/100?text=Foto";
+      }
+    }
+
+    function editUsername() {
+      const current = document.getElementById('displayName').textContent;
+      const newName = prompt('Digite seu novo nome de usuário:', current);
+      if (newName && newName.trim() !== '') {
+        document.getElementById('displayName').textContent = newName.trim();
+        
+        // Atualiza no localStorage
+        const user = JSON.parse(localStorage.getItem('lifeInvaderUser'));
+        user.username = newName.trim();
+        localStorage.setItem('lifeInvaderUser', JSON.stringify(user));
+      }
+    }
+
+    function changeProfilePic(event) {
+      const file = event.target.files[0];
+      if (file) {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+          const img = document.getElementById('profilePic');
+          img.src = e.target.result;
+
+          // Salva no localStorage
+          const user = JSON.parse(localStorage.getItem('lifeInvaderUser'));
+          user.profilePic = e.target.result;
+          localStorage.setItem('lifeInvaderUser', JSON.stringify(user));
+        };
+        reader.readAsDataURL(file);
+      }
+    }
+  </script>
+</body>
+</html>
